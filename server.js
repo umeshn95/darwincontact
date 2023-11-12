@@ -10,6 +10,29 @@ const port = process.env.PORT || 3001;
 
 mongoose.connect(process.env.mongouri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+// allow origin
+
+app.use((req, res, next) => {
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      "https:darwinanalytic.com"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", true);
+    res.setHeader("Access-Control-Allow-Private-Network", true);
+    //  Firefox caps this at 24 hours (86400 seconds). Chromium (starting in v76) caps at 2 hours (7200 seconds). The default value is 5 seconds.
+    res.setHeader("Access-Control-Max-Age", 7200);
+  
+    next();
+  });
+
 const Contact = mongoose.model('Contact', {
   fullName: String,
   email: String,
@@ -28,6 +51,9 @@ const validateContactForm = [
   body('howDidYouHear').notEmpty().withMessage('Please specify how you heard about us.'),
   body('message').notEmpty().withMessage('Message cannot be empty.'),
 ];
+
+
+
 
 // Endpoint to handle contact form submissions with validation
 app.post('/api/contact', validateContactForm, async (req, res) => {

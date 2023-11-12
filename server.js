@@ -34,7 +34,7 @@ mongoose.connect(process.env.mongouri, { useNewUrlParser: true, useUnifiedTopolo
 //     next();
 //   });
 
-app.use(cors())
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 const Contact = mongoose.model('Contact', {
   fullName: String,

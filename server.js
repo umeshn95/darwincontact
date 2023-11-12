@@ -1,6 +1,7 @@
 // server.js
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors')
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { body, validationResult } = require('express-validator');
@@ -12,26 +13,28 @@ mongoose.connect(process.env.mongouri, { useNewUrlParser: true, useUnifiedTopolo
 
 // allow origin
 
-app.use((req, res, next) => {
-    res.setHeader(
-      "Access-Control-Allow-Origin",
-      "https:darwinanalytic.com"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Private-Network", true);
-    //  Firefox caps this at 24 hours (86400 seconds). Chromium (starting in v76) caps at 2 hours (7200 seconds). The default value is 5 seconds.
-    res.setHeader("Access-Control-Max-Age", 7200);
+// app.use((req, res, next) => {
+//     res.setHeader(
+//       "Access-Control-Allow-Origin",
+//       "https:darwinanalytic.com"
+//     );
+//     res.setHeader(
+//       "Access-Control-Allow-Methods",
+//       "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE"
+//     );
+//     res.setHeader(
+//       "Access-Control-Allow-Headers",
+//       "Content-Type, Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
+//     );
+//     res.setHeader("Access-Control-Allow-Credentials", true);
+//     res.setHeader("Access-Control-Allow-Private-Network", true);
+//     //  Firefox caps this at 24 hours (86400 seconds). Chromium (starting in v76) caps at 2 hours (7200 seconds). The default value is 5 seconds.
+//     res.setHeader("Access-Control-Max-Age", 7200);
   
-    next();
-  });
+//     next();
+//   });
+
+app.use(cors())
 
 const Contact = mongoose.model('Contact', {
   fullName: String,
@@ -57,6 +60,11 @@ const validateContactForm = [
 
 // Endpoint to handle contact form submissions with validation
 app.post('/api/contact', validateContactForm, async (req, res) => {
+
+    res.header('Access-Control-Allow-Origin', 'http://darwinanalytic.com');
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   // Check for validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

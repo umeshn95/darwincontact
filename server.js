@@ -1,4 +1,5 @@
 // server.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -7,7 +8,7 @@ const { body, validationResult } = require('express-validator');
 const app = express();
 const port = process.env.PORT || 3001;
 
-mongoose.connect('mongodb://0.0.0.0:27017/contactapp', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.mongouri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const Contact = mongoose.model('Contact', {
   fullName: String,

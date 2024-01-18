@@ -37,48 +37,41 @@ mongoose.connect(process.env.mongouri, { useNewUrlParser: true, useUnifiedTopolo
 app.use(cors())
 
 const Contact = mongoose.model('Contact', {
-  fullName: String,
+  firstname: String,
+  lastname: String,
   email: String,
-  seeking: String,
-  howDidYouHear: String,
+  organization: String,
   message: String,
 });
+
 
 app.use(bodyParser.json());
 
 // Validation middleware
 const validateContactForm = [
-  body('fullName').notEmpty().withMessage('Full Name is required.'),
+  body('firstname').notEmpty().withMessage('First Name is required.'),
+  body('lastname').notEmpty().withMessage('Last Name is required.'),
   body('email').isEmail().withMessage('Invalid email address.'),
-  body('seeking').notEmpty().withMessage('Please specify what you are seeking.'),
-  body('howDidYouHear').notEmpty().withMessage('Please specify how you heard about us.'),
+  body('organization').notEmpty().withMessage('Organization is required.'),
   body('message').notEmpty().withMessage('Message cannot be empty.'),
 ];
 
 
 
 
+
 // Endpoint to handle contact form submissions with validation
 app.post('/api/contact', validateContactForm, async (req, res) => {
-
-    res.header('Access-Control-Allow-Origin', 'http://darwinanalytic.com');
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  // Check for validation errors
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
-  }
+  // ...
 
   try {
-    const { fullName, email, seeking, howDidYouHear, message } = req.body;
+    const { firstname, lastname, email, organization, message } = req.body;
 
     const newContact = new Contact({
-      fullName,
+      firstname,
+      lastname,
       email,
-      seeking,
-      howDidYouHear,
+      organization,
       message,
     });
 
@@ -90,6 +83,7 @@ app.post('/api/contact', validateContactForm, async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

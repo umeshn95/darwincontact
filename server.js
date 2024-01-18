@@ -43,17 +43,43 @@ const Contact = mongoose.model('Contact', {
   organization: String,
   message: String,
 });
+const Newsletter = mongoose.model('Newsletter', {
+  firstname: String,
+  lastname: String,
+  email: String,
+  
+});
 
 
 app.use(bodyParser.json());
 
 // Validation middleware
+
 const validateContactForm = [
   body('firstname').notEmpty().withMessage('First Name is required.'),
   body('lastname').notEmpty().withMessage('Last Name is required.'),
-  body('email').isEmail().withMessage('Invalid email address.'),
+  body('email')
+    .isEmail().withMessage('Invalid email address.')
+    .custom((value) => {
+      if (value.includes('@gmail.com')) {
+        throw new Error('Email address cannot be from gmail.com');
+      }
+      return true;
+    }),
   body('organization').notEmpty().withMessage('Organization is required.'),
   body('message').notEmpty().withMessage('Message cannot be empty.'),
+];
+const validateContactFormNewsletter = [
+  body('firstname').notEmpty().withMessage('First Name is required.'),
+  body('lastname').notEmpty().withMessage('Last Name is required.'),
+  body('email')
+    .isEmail().withMessage('Invalid email address.')
+    .custom((value) => {
+      if (value.includes('@gmail.com')) {
+        throw new Error('Email address cannot be from gmail.com');
+      }
+      return true;
+    }),
 ];
 
 
@@ -84,6 +110,27 @@ app.post('/api/contact', validateContactForm, async (req, res) => {
   }
 });
 
+app.post('/api/newsletter', validateContactFormNewsletter, async (req, res) => {
+  // ...
+
+  try {
+    const { firstname, lastname, email } = req.body;
+
+    const newNewsletter = new Newsletter({
+      firstname,
+      lastname,
+      email,
+      
+    });
+
+    await newNewsletter.save();
+
+    res.json({ success: true, message: 'Submission received successfully!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

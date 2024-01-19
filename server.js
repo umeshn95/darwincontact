@@ -50,6 +50,70 @@ const Newsletter = mongoose.model('Newsletter', {
   
 });
 
+// Registration Model
+const Registration = mongoose.model('Registration', {
+  iam: String,
+  state: String,
+  municipalType: String,
+  schoolType: String,
+  organizationType: String,
+  role: String,
+  firstname: String,
+  lastname: String,
+  email: String,
+  password: String,
+});
+
+// Validation middleware for registration
+const validateRegistrationForm = [
+  body('iam').notEmpty().withMessage('I am field is required.'),
+  // Add more validation rules for other fields
+  body('email').isEmail().withMessage('Invalid email address.'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long.')
+];
+
+// Endpoint for registration form
+app.post('/api/register', validateRegistrationForm, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const newRegistration = new Registration(req.body);
+    await newRegistration.save();
+    res.json({ success: true, message: 'Registration successful!' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await Registration.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    res.json({ token, message: 'Logged in successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+});
+
 
 app.use(bodyParser.json());
 

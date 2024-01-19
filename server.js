@@ -30,11 +30,12 @@ mongoose.connect(process.env.mongouri, { useNewUrlParser: true, useUnifiedTopolo
 //     res.setHeader("Access-Control-Allow-Private-Network", true);
 //     //  Firefox caps this at 24 hours (86400 seconds). Chromium (starting in v76) caps at 2 hours (7200 seconds). The default value is 5 seconds.
 //     res.setHeader("Access-Control-Max-Age", 7200);
-  
+
 //     next();
 //   });
 
 app.use(cors())
+app.use(bodyParser.json());
 
 const Contact = mongoose.model('Contact', {
   firstname: String,
@@ -73,7 +74,7 @@ const validateRegistrationForm = [
 ];
 
 // Endpoint for registration form
-app.post('/api/register', async (req, res) => {
+app.post('/api/register',validateRegistrationForm, async (req, res) => {
   console.log(req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -116,7 +117,6 @@ app.post('/api/login', async (req, res) => {
 });
 
 
-app.use(bodyParser.json());
 
 // Validation middleware
 

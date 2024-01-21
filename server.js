@@ -75,6 +75,7 @@ const validateRegistrationForm = [
 
 // Endpoint for registration form
 app.post('/api/register',validateRegistrationForm, async (req, res) => {
+  
   console.log(req.body);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -92,6 +93,10 @@ app.post('/api/register',validateRegistrationForm, async (req, res) => {
 });
 
 app.post('/api/login', async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { email, password } = req.body;
     const user = await Registration.findOne({ email });
@@ -154,7 +159,10 @@ const validateContactFormNewsletter = [
 // Endpoint to handle contact form submissions with validation
 app.post('/api/contact', validateContactForm, async (req, res) => {
   // ...
-
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { firstname, lastname, email, organization, message } = req.body;
 
@@ -177,7 +185,10 @@ app.post('/api/contact', validateContactForm, async (req, res) => {
 
 app.post('/api/newsletter', validateContactFormNewsletter, async (req, res) => {
   // ...
-
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { firstname, lastname, email } = req.body;
 
@@ -200,6 +211,9 @@ app.post('/api/newsletter', validateContactFormNewsletter, async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+
+
 
 
 
